@@ -4086,6 +4086,7 @@ void Parser::ParseDeclarationSpecifiers(
       isStorageClass = true;
       break;
     case tok::kw_static:
+    case tok::kw_cross_static:
       if (DS.getThreadStorageClassSpec() == DeclSpec::TSCS___thread)
         Diag(Tok, diag::ext_thread_before) << "static";
       isInvalid = DS.SetStorageClassSpec(Actions, DeclSpec::SCS_static, Loc,
@@ -5781,6 +5782,7 @@ bool Parser::isDeclarationSpecifier(
   case tok::kw_extern:
   case tok::kw___private_extern__:
   case tok::kw_static:
+  case tok::kw_cross_static:
   case tok::kw_auto:
   case tok::kw___auto_type:
   case tok::kw_register:
@@ -7752,6 +7754,7 @@ void Parser::ParseBracketDeclarator(Declarator &D) {
   // If valid, this location is the position where we read the 'static' keyword.
   SourceLocation StaticLoc;
   TryConsumeToken(tok::kw_static, StaticLoc);
+  TryConsumeToken(tok::kw_cross_static, StaticLoc);
 
   // If there is a type-qualifier-list, read it now.
   // Type qualifiers in an array subscript are a C99 feature.
@@ -7760,8 +7763,10 @@ void Parser::ParseBracketDeclarator(Declarator &D) {
 
   // If we haven't already read 'static', check to see if there is one after the
   // type-qualifier-list.
-  if (!StaticLoc.isValid())
+  if (!StaticLoc.isValid()) {
     TryConsumeToken(tok::kw_static, StaticLoc);
+    TryConsumeToken(tok::kw_cross_static, StaticLoc);
+  }
 
   // Handle "direct-declarator [ type-qual-list[opt] * ]".
   bool isStar = false;

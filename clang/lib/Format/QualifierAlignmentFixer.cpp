@@ -163,6 +163,7 @@ static bool isQualifier(const FormatToken *const Tok) {
 
   switch (Tok->Tok.getKind()) {
   case tok::kw_const:
+  case tok::kw_cross_static:
   case tok::kw_volatile:
   case tok::kw_static:
   case tok::kw_inline:
@@ -525,6 +526,7 @@ tok::TokenKind LeftRightQualifierAlignmentFixer::getTokenFromQualifier(
       .Case("const", tok::kw_const)
       .Case("volatile", tok::kw_volatile)
       .Case("static", tok::kw_static)
+      .Case("cross_static", tok::kw_cross_static)
       .Case("inline", tok::kw_inline)
       .Case("constexpr", tok::kw_constexpr)
       .Case("restrict", tok::kw_restrict)

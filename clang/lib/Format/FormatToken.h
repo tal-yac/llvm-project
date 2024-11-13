@@ -1671,6 +1671,7 @@ struct AdditionalKeywords {
     case tok::kw_class:
     case tok::kw_continue:
     case tok::kw_const:
+    case tok::kw_cross_static:
     case tok::kw_default:
     case tok::kw_delete:
     case tok::kw_do:
@@ -1792,6 +1793,7 @@ struct AdditionalKeywords {
     case tok::kw_class:
     case tok::kw_const:
     case tok::kw_continue:
+    case tok::kw_cross_static:
     case tok::kw_default:
     case tok::kw_do:
     case tok::kw_extern:

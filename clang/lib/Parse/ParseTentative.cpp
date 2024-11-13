@@ -1164,6 +1164,7 @@ Parser::isCXXDeclarationSpecifier(ImplicitTypenameContext AllowImplicitTypename,
     // storage-class-specifier
   case tok::kw_register:
   case tok::kw_static:
+  case tok::kw_cross_static:
   case tok::kw_extern:
   case tok::kw_mutable:
   case tok::kw___thread:

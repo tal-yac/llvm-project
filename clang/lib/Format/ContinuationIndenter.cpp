@@ -1377,7 +1377,7 @@ unsigned ContinuationIndenter::getNewLineColumn(const LineState &State) {
   }
   if (Current.is(TT_LambdaArrow) &&
       Previous.isOneOf(tok::kw_noexcept, tok::kw_mutable, tok::kw_constexpr,
-                       tok::kw_consteval, tok::kw_static,
+                       tok::kw_consteval, tok::kw_static, tok::kw_cross_static,
                        TT_AttributeRSquare)) {
     return ContinuationIndent;
   }
