@@ -259,7 +259,12 @@ llvm::Constant *CodeGenModule::getOrCreateStaticVarDecl(
   // them. It is possible to reference them before emitting the function that
   // contains them, and it is possible to emit the containing function multiple
   // times.
-  if (llvm::Constant *ExistingGV = StaticLocalDeclMap[&D])
+  const Decl *DeclAddr = &D;
+  if (const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(D.getDeclContext()))) {
+    DeclAddr = FD->getInstantiatedFromDecl();
+  }
+  
+  if (llvm::Constant *ExistingGV = StaticLocalDeclMap[DeclAddr])
     return ExistingGV;
 
   QualType Ty = D.getType();
@@ -309,8 +314,7 @@ llvm::Constant *CodeGenModule::getOrCreateStaticVarDecl(
                                getContext().getTargetAddressSpace(ExpectedAS)));
   }
 
-  setStaticLocalDeclAddress(&D, Addr);
-
+  setStaticLocalDeclAddress(DeclAddr, Addr);
   // Ensure that the static local gets initialized by making sure the parent
   // function gets emitted eventually.
   const Decl *DC = cast<Decl>(D.getDeclContext());
