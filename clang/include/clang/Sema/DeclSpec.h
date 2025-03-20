@@ -330,6 +330,8 @@ private:
   unsigned ThreadStorageClassSpec : 2;
   LLVM_PREFERRED_TYPE(bool)
   unsigned SCS_extern_in_linkage_spec : 1;
+  LLVM_PREFERRED_TYPE(bool)
+  unsigned CrossStatic : 1;
 
   // type-specifier
   LLVM_PREFERRED_TYPE(TypeSpecifierWidth)
@@ -454,6 +456,7 @@ public:
       : StorageClassSpec(SCS_unspecified),
         ThreadStorageClassSpec(TSCS_unspecified),
         SCS_extern_in_linkage_spec(false),
+        CrossStatic(false),
         TypeSpecWidth(static_cast<unsigned>(TypeSpecifierWidth::Unspecified)),
         TypeSpecComplex(TSC_unspecified),
         TypeSpecSign(static_cast<unsigned>(TypeSpecifierSign::Unspecified)),
@@ -477,6 +480,12 @@ public:
     SCS_extern_in_linkage_spec = Value;
   }
 
+  bool isCrossStatic() const { return CrossStatic; }
+  void SetCrossStatic(bool Value) {
+    CrossStatic = Value;
+  }
+
+
   SourceLocation getStorageClassSpecLoc() const { return StorageClassSpecLoc; }
   SourceLocation getThreadStorageClassSpecLoc() const {
     return ThreadStorageClassSpecLoc;
@@ -486,6 +495,7 @@ public:
     StorageClassSpec           = DeclSpec::SCS_unspecified;
     ThreadStorageClassSpec     = DeclSpec::TSCS_unspecified;
     SCS_extern_in_linkage_spec = false;
+    CrossStatic                = false;
     StorageClassSpecLoc        = SourceLocation();
     ThreadStorageClassSpecLoc  = SourceLocation();
   }

@@ -7715,6 +7715,18 @@ NamedDecl *Sema::ActOnVariableDeclarator(
     return nullptr;
   }
 
+  if (D.getDeclSpec().isCrossStatic()) {
+    const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(DC));
+    if (!FD) {
+      Diag(D.getIdentifierLoc(), diag::err_cross_static_outside_of_template) << Name;
+      return nullptr;
+    }
+    if (FD->getTemplatedKind() == FunctionDecl::TK_NonTemplate) {
+      Diag(D.getIdentifierLoc(), diag::err_cross_static_outside_of_template) << Name;
+      return nullptr;
+    }
+  }
+
 
   DeclSpec::SCS SCSpec = D.getDeclSpec().getStorageClassSpec();
   StorageClass SC = StorageClassSpecToVarDeclStorageClass(D.getDeclSpec());
