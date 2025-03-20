@@ -30,6 +30,7 @@
 #include "clang/AST/Type.h"
 #include "clang/Basic/Builtins.h"
 #include "clang/Basic/DiagnosticComment.h"
+#include "clang/Basic/DiagnosticSema.h"
 #include "clang/Basic/PartialDiagnostic.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TargetInfo.h"
@@ -7715,6 +7716,23 @@ NamedDecl *Sema::ActOnVariableDeclarator(
     return nullptr;
   }
 
+  if (D.getDeclSpec().isCrossStatic()) {
+    const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(DC));
+    if (!FD) {
+      Diag(D.getIdentifierLoc(), diag::err_cross_static_outside_of_template) << Name;
+      return nullptr;
+    }
+    switch (FD->getTemplatedKind()) {
+      case FunctionDecl::TK_NonTemplate:
+        Diag(D.getIdentifierLoc(), diag::err_cross_static_outside_of_template) << Name;
+        return nullptr;
+      case FunctionDecl::TK_FunctionTemplateSpecialization:
+        Diag(D.getIdentifierLoc(), diag::err_cross_static_inside_of_template_spec) << Name;
+        return nullptr;
+      default:
+        break;
+    }
+  }
 
   DeclSpec::SCS SCSpec = D.getDeclSpec().getStorageClassSpec();
   StorageClass SC = StorageClassSpecToVarDeclStorageClass(D.getDeclSpec());
