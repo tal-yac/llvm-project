@@ -8055,6 +8055,8 @@ NamedDecl *Sema::ActOnVariableDeclarator(
       NewVD->setLocalExternDecl();
   }
 
+  NewVD->setCrossStatic(D.getDeclSpec().isCrossStatic());
+
   bool EmitTLSUnsupportedError = false;
   if (DeclSpec::TSCS TSCS = D.getDeclSpec().getThreadStorageClassSpec()) {
     // C++11 [dcl.stc]p4:

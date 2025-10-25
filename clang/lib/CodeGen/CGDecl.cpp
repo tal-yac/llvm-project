@@ -267,8 +267,8 @@ llvm::Constant *CodeGenModule::getOrCreateStaticVarDecl(
         if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
           for (auto OriginD : DS->decls())
             if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
-              if (VD->getDeclName().getAsString() ==
-                  D.getDeclName().getAsString()) {
+              if (VD->isCrossStatic() && VD->getDeclName().getAsString() ==
+                D.getDeclName().getAsString()) {
                 DeclAddr = VD;
               }
         }

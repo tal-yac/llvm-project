@@ -1116,6 +1116,10 @@ protected:
     /// loop.
     LLVM_PREFERRED_TYPE(bool)
     unsigned IsCXXForRangeImplicitVar : 1;
+
+    /// Whether this variable is cross static or not.
+    LLVM_PREFERRED_TYPE(bool)
+    unsigned IsCrossStatic : 1;
   };
 
   union {
@@ -1581,6 +1585,14 @@ public:
   void setInitCapture(bool IC) {
     assert(!isa<ParmVarDecl>(this));
     NonParmVarDeclBits.IsInitCapture = IC;
+  }
+
+  bool isCrossStatic() const {
+    return isa<ParmVarDecl>(this) ? false : NonParmVarDeclBits.IsCrossStatic;
+  }
+  void setCrossStatic(bool CS) {
+    assert(!isa<ParmVarDecl>(this));
+    NonParmVarDeclBits.IsCrossStatic = CS;
   }
 
   /// Whether this local extern variable declaration's previous declaration
