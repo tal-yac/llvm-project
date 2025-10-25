@@ -2742,7 +2742,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
         if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
           for (auto OriginD : DS->decls())
             if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
-              if (VD->getDeclName().getAsString() ==
+              if (VD->isCrossStatic() && VD->getDeclName().getAsString() ==
                   D.getDeclName().getAsString()) {
                 DeclAddr = VD;
               }
@@ -2750,6 +2750,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
       }
     }
   }
+
   llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(DeclAddr);
   if (!guard) {
     // Mangle the name for the guard.
