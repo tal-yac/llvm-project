@@ -2734,13 +2734,29 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
 
   // Create the guard variable if we don't already have it (as we
   // might if we're double-emitting this function body).
-  llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(&D);
+  const VarDecl *DeclAddr = &D;
+  if (const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(D.getDeclContext()))) {
+    if (auto FTD = FD->getPrimaryTemplate()) {
+      auto CS = dyn_cast<CompoundStmt>(FTD->getTemplatedDecl()->getBody());
+      for (auto S : CS->body()) {
+        if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
+          for (auto OriginD : DS->decls())
+            if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
+              if (VD->getDeclName().getAsString() ==
+                  D.getDeclName().getAsString()) {
+                DeclAddr = VD;
+              }
+        }
+      }
+    }
+  }
+  llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(DeclAddr);
   if (!guard) {
     // Mangle the name for the guard.
     SmallString<256> guardName;
     {
       llvm::raw_svector_ostream out(guardName);
-      getMangleContext().mangleStaticGuardVariable(&D, out);
+      getMangleContext().mangleStaticGuardVariable(DeclAddr, out);
     }
 
     // Create the guard variable with a zero-initializer.
@@ -2769,7 +2785,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
       guard->setComdat(CGM.getModule().getOrInsertComdat(guard->getName()));
     }
 
-    CGM.setStaticLocalDeclGuardAddress(&D, guard);
+    CGM.setStaticLocalDeclGuardAddress(DeclAddr, guard);
   }
 
   Address guardAddr = Address(guard, guard->getValueType(), guardAlignment);
@@ -2841,7 +2857,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
 
     // Check if the first byte of the guard variable is zero.
     CGF.EmitCXXGuardedInitBranch(NeedsInit, InitCheckBlock, EndBlock,
-                                 CodeGenFunction::GuardKind::VariableGuard, &D);
+                                 CodeGenFunction::GuardKind::VariableGuard, DeclAddr);
 
     CGF.EmitBlock(InitCheckBlock);
   }
