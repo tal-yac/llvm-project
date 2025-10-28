@@ -2735,21 +2735,22 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
   // Create the guard variable if we don't already have it (as we
   // might if we're double-emitting this function body).
   const VarDecl *DeclAddr = &D;
-  if (const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(D.getDeclContext()))) {
-    if (auto FTD = FD->getPrimaryTemplate()) {
-      auto CS = dyn_cast<CompoundStmt>(FTD->getTemplatedDecl()->getBody());
-      for (auto S : CS->body()) {
-        if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
-          for (auto OriginD : DS->decls())
-            if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
-              if (VD->isCrossStatic() && VD->getDeclName().getAsString() ==
-                  D.getDeclName().getAsString()) {
-                DeclAddr = VD;
-              }
+  if (D.isCrossStatic())
+    if (const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(D.getDeclContext()))) {
+      if (auto FTD = FD->getPrimaryTemplate()) {
+        auto CS = dyn_cast<CompoundStmt>(FTD->getTemplatedDecl()->getBody());
+        for (auto S : CS->body()) {
+          if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
+            for (auto OriginD : DS->decls())
+              if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
+                if (VD->getDeclName().getAsString() ==
+                    D.getDeclName().getAsString()) {
+                  DeclAddr = VD;
+                }
+          }
         }
       }
     }
-  }
 
   llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(DeclAddr);
   if (!guard) {
