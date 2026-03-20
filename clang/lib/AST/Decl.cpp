@@ -2816,6 +2816,14 @@ void VarDecl::setDescribedVarTemplate(VarTemplateDecl *Template) {
   getASTContext().setTemplateOrSpecializationInfo(this, Template);
 }
 
+VarDecl *VarDecl::getTemplatedOrigin() const {
+  return Origin;
+}
+
+void VarDecl::setTemplatedOrigin(VarDecl *VD) {
+  Origin = VD;
+}
+
 bool VarDecl::isKnownToBeDefined() const {
   const auto &LangOpts = getASTContext().getLangOpts();
   // In CUDA mode without relocatable device code, variables of form 'extern
