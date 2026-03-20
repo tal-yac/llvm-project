@@ -2736,21 +2736,7 @@ void ItaniumCXXABI::EmitGuardedInit(CodeGenFunction &CGF,
   // might if we're double-emitting this function body).
   const VarDecl *DeclAddr = &D;
   if (D.isCrossStatic())
-    if (const auto *FD = dyn_cast<FunctionDecl>(cast<Decl>(D.getDeclContext()))) {
-      if (auto FTD = FD->getPrimaryTemplate()) {
-        auto CS = dyn_cast<CompoundStmt>(FTD->getTemplatedDecl()->getBody());
-        for (auto S : CS->body()) {
-          if (const auto *DS = llvm::dyn_cast_or_null<DeclStmt>(S)) {
-            for (auto OriginD : DS->decls())
-              if (const auto *VD = llvm::dyn_cast_or_null<VarDecl>(OriginD))
-                if (VD->getDeclName().getAsString() ==
-                    D.getDeclName().getAsString()) {
-                  DeclAddr = VD;
-                }
-          }
-        }
-      }
-    }
+    DeclAddr = D.getOld();
 
   llvm::GlobalVariable *guard = CGM.getStaticLocalDeclGuardAddress(DeclAddr);
   if (!guard) {

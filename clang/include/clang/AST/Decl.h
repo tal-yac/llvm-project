@@ -976,6 +976,10 @@ private:
   friend class ASTNodeImporter;
   friend class StmtIteratorBase;
 
+  /// A pointer to the original VarDecl this
+  /// instance was instantiated from
+  VarDecl *Old = nullptr;
+
   class VarDeclBitfields {
     friend class ASTDeclReader;
     friend class VarDecl;
@@ -1699,6 +1703,10 @@ public:
   VarTemplateDecl *getDescribedVarTemplate() const;
 
   void setDescribedVarTemplate(VarTemplateDecl *Template);
+
+  VarDecl *getOld() const;
+
+  void setOld(VarDecl *Template);
 
   // Is this variable known to have a definition somewhere in the complete
   // program? This may be true even if the declaration has internal linkage and

@@ -6066,6 +6066,8 @@ void Sema::BuildVariableInstantiation(
       (OldVar->getDescribedVarTemplate() ||
        isa<VarTemplatePartialSpecializationDecl>(OldVar));
 
+  NewVar->setOld(OldVar);
+
   // If we are instantiating a local extern declaration, the
   // instantiation belongs lexically to the containing function.
   // If we are instantiating a static data member defined
