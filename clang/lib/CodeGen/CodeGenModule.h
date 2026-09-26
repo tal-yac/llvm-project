@@ -761,10 +761,10 @@ public:
     return CoverageMapping.get();
   }
 
-  llvm::Constant *getStaticLocalDeclAddress(const Decl *D) {
+  llvm::Constant *getStaticLocalDeclAddress(const VarDecl *D) {
     return StaticLocalDeclMap[D];
   }
-  void setStaticLocalDeclAddress(const Decl *D,
+  void setStaticLocalDeclAddress(const VarDecl *D,
                                  llvm::Constant *C) {
     StaticLocalDeclMap[D] = C;
   }

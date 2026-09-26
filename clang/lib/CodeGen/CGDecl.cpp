@@ -259,7 +259,7 @@ llvm::Constant *CodeGenModule::getOrCreateStaticVarDecl(
   // them. It is possible to reference them before emitting the function that
   // contains them, and it is possible to emit the containing function multiple
   // times.
-  const Decl *DeclAddr = &D;
+  const VarDecl *DeclAddr = &D;
   if (D.isCrossStatic())
     DeclAddr = D.getTemplatedOrigin();
   
